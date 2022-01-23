@@ -2,11 +2,9 @@
 
 Steps to take when solving a System Design Problem. Let's assume interviews take a total of 60 minutes.
 
-## Step 1: Requirements Clarifications
+## Step 1: Requirements Clarifications (5min)
 
 Ask questions about the scope of the problem and clarify ambiguities. This part will also be important to guide our estimates later on.
-
-Time Expected: 5 minutes
 
 - Who is going to use it?
 - How many users will use it?
@@ -14,9 +12,7 @@ Time Expected: 5 minutes
 - Should we focus on the backend or frontend?
 - What are the inputs and outputs of the system?
 
-## Step 2: Back-of-the-envelope Estimation
-
-Time Expected: 5 minutes
+## Step 2: Back-of-the-envelope Estimation (5min)
 
 Now, get the requirements and ask questions and make assumptions about the scale of the system.
 
@@ -35,7 +31,7 @@ Finish this step with a table containing the High-Level Estimates.
 | Storage for 5 years | 10 TB    |
 | Memory for Cache    | 100 GB   |
 
-## Step 3:  API Design
+## Step 3:  API Design (5min)
 
 Define what is expected from the system in terms of APIs.
 
@@ -45,7 +41,7 @@ Define what is expected from the system in terms of APIs.
 
 Explain how we can prevent malicious users from abusing our APIs.
 
-## Step 4: Defining a Data Model
+## Step 4: Defining a Data Model (5min)
 
 Describe the entities of the system, the relationships and how they interact with each other.
 
@@ -62,7 +58,7 @@ Other questions to follow:
 - What kind of database should we use, NoSQL or SQL databases?
 - Where should we store our images?
 
-## Step 5: High-Level Design and Algorithm
+## Step 5: High-Level Design and Algorithm (10min)
 
 Draw a diagram containing the database, servers to handle read/write requests, load balancers and other high level components we are going to need.
 
@@ -70,7 +66,7 @@ Also, talk about the basic algorithm we are going to use. For example, what hash
 
 ![High Level Design](high-level-design.svg)
 
-## Step 6: Deep Dive
+## Step 6: Deep Dive (15-20min)
 
 Go deeper into the components of the system. Talk about how the design will be impacted as we try to scale the application.
 
@@ -80,7 +76,7 @@ Go deeper into the components of the system. Talk about how the design will be i
 - What components need load balancing?
 - Do we need to use Message Queues for async operations?
 
-## Step 7: Identify bottlenecks
+## Step 7: Identify bottlenecks (5min)
 
 Address bottlenecks and discuss potential solutions and trade-offs.
 
