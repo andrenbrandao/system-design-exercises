@@ -86,7 +86,7 @@ of the available storage. Which raises our storage needs to **3TB**.
 
 |||
 |--|--|
-|Storage|5TB for 5 years|
+|Storage|3TB for 5 years|
 
 **Bandwith Estimates:** For write requests we expect 12 req/sec, and given every write is about
 10KB, we have an ingress of 120KB/sec.
