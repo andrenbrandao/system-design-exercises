@@ -18,7 +18,7 @@ Let's design a Pastebin like web service, where users can store plain text. User
 - Users will only be able to paste text.
 - Users can only paste text up to 5MB.
 - They can do it anonymously. So we don't need to cover authentication here.
-- Links will expire after a period of time. Users can also choose how long it will take.
+- Links will expire after a period of time. The default is 10 minutes. Users can also choose how long it will take.
 
 ### Non-Functional Requirements
 
@@ -39,8 +39,12 @@ Let's assume the Read:Write ratio is 10:1.
 **Traffic Estimates:** Our system is supposed to receive 1 million pastes every day. So,
 We will have 10 million reads/day.
 
-If it is evenly distributed over the day, that would be 10.000.000 / (24*60*60) = ~120 req/sec
-for read requests and ~12 req/sec for writes.
+If it is evenly distributed over the day, that would be 10.000.000 / (24*60*60) = ~120 req/sec for read requests and ~12 req/sec for writes.
+
+| | |
+|---|---|
+|Read Requests|~120req/sec|
+|Write Requests|~12req/sec|
 
 **Storage Estimates:** The maximum size of text we will be able to handle is 5MB. But the average
 text will be much less than that. Assuming that every character takes 1 Byte and that our users
@@ -80,10 +84,19 @@ If it takes 1 byte to store each character, the total size to store all keys wou
 To keep some margin, let's assume a 70% capacity model, where we won't use more than 70%
 of the available storage. Which raises our storage needs to **3TB**.
 
+|||
+|--|--|
+|Storage|5TB for 5 years|
+
 **Bandwith Estimates:** For write requests we expect 12 req/sec, and given every write is about
 10KB, we have an ingress of 120KB/sec.
 
 For read requests, we have 120 req/sec, giving an egress of 1200KB/sec = 1.2MB/sec.
+
+|||
+|--|--|
+|Ingress|120KB/sec|
+|Egress|1.2MB/sec|
 
 **Memory Estimates:** We can cache the most accessed pastes. If we follow the pareto principle,
 20% of our pastes will account for 80% of the requests. So, let's cache these 20%.
@@ -95,15 +108,52 @@ With 10M reads in a day, we would need to cache:
 Also, notice that since most of our requests will be to expired pastes, because they
 only last for 10 minutes, we will be able to remove them from the cache, decreasing this size.
 
+|||
+|--|--|
+|Memory|20GB for Cache|
+
+### Summary
+
 |Type|Estimate|
 |---|---|
 |New Pastes|1M pastes/day|
 |Reads|10M/day|
 |Write Requests|120req/sec|
 |Read Requests|12req/sec|
-|Storage|3TB in 5 yerrs|
+|Storage|3TB in 5 years|
 |Incoming Data|120KB/sec|
 |Outgoing Data|1.2MB/sec|
 |Memory for Cache|20GB|
 
-### Step 3: API Design
+## Step 3: API Design
+
+Given our requirements, let's create our API. User's should be able to paste texts, se let's create an endpoint for that.
+
+`postText(text, expiration_period=10)`
+
+**Request Parameters:**
+
+- text (string): what the user wants to paste.
+- expiration_period (integer): set in minutes. The default is 10. To never expire, set to -1.
+
+**Returns: (string)**
+
+- Generated URL with key.
+
+`readText(key)`
+
+**Request Parameters:**
+
+- key: identifier of the pasted text.
+
+**Returns:**
+
+- The pasted text
+
+### How can we prevent malicious users from abusing our APIs?
+
+- We could use a rate limiter in our Load Balancers and block IPs that are making too many requests in a period of time.
+- If we get too many requests from a IP Address, and they try to store big amount of texts? We could store the IP Addresses of the requests and later we could find which data came from that user. That way it would be easier to delete them.
+- Also, if we could add authentication and require users to Login if we identify any malicious usage from their IPs.
+
+## Step 4: Defining a Data Model
