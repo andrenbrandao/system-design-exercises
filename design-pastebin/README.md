@@ -154,6 +154,39 @@ Given our requirements, let's create our API. User's should be able to paste tex
 
 - We could use a rate limiter in our Load Balancers and block IPs that are making too many requests in a period of time.
 - If we get too many requests from a IP Address, and they try to store big amount of texts? We could store the IP Addresses of the requests and later we could find which data came from that user. That way it would be easier to delete them.
-- Also, if we could add authentication and require users to Login if we identify any malicious usage from their IPs.
+- Also, we could add authentication and require users to Login if we identify any malicious usage from their IPs.
 
 ## Step 4: Defining a Data Model
+
+Since we are not implementing any type of authentication, we only have pastes in our system.
+
+It is also important to notice:
+
+- We will store billions of records
+- Each paste object can have up to 5MB
+
+```
+Paste: id, key, text, expiration_date
+
+id (string): UUID generated
+key (string): The base64 key created
+text (string): Content pasted
+expiration_date (datetime): Date of expiration
+created_at (datetime): Creation date of key
+```
+
+Given that we have billions of records and there is no relationship between entities, we could use a NoSQL database. It will also be easier to scale it than with a SQL database.
+
+## Step 5: High Level Design
+
+The client will make requests to a load balancer and those requests will be balanced between multiple servers. Since we are assuming we will have a lot more reads, we can also have separate servers to handle these scenarios.
+
+As explained before, our bet is in a NoSQL database, since we do not have relationships and it will be easier to scale.
+
+![High Level Design](high-level-design.svg)
+
+## Step 6: Deep Dive
+
+**Write Requests**: Every time a user creates a paste we have to generate a key. Since we have decided for a 5-letter string, we can generate this random string and store it in the database. However, we can have collisions, so if we receive a duplicate key error we can retry by generating a new key until we receive a successful response from the database.
+
+**Read Requests**: Users will access the pastes through a URL with a given key. Our application server will then fetch the data with the key in the database. We can also cache the most used keys for faster responses. If the key is not found we return an error.
